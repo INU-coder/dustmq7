@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>베이직반 탈출기</title>
+  <!-- CSS 파일 링크 -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <h1>회원가입 및 로그인 시스템</h1>
+
+  <!-- 다크 모드 전환 버튼 -->
+  <button class="toggle-theme">다크 모드로 전환</button>
+
+  <!-- 회원가입 폼 -->
+  <h2>회원가입</h2>
+  <form id="signupForm">
+    <label for="signup-id">ID (이메일): </label>
+    <input type="email" id="signup-id" name="id" required /><br /><br />
+    <label for="signup-name">이름: </label>
+    <input type="text" id="signup-name" name="name" required /><br /><br />
+    <label for="signup-password">비밀번호: </label>
+    <input type="password" id="signup-password" name="password" required /><br /><br />
+    <button type="submit">회원가입</button>
+  </form>
+  <div id="signup-result"></div>
+
+  <!-- 로그인 폼 -->
+  <h2>로그인</h2>
+  <form id="loginForm">
+    <label for="login-id">ID (이메일): </label>
+    <input type="email" id="login-id" name="id" required /><br /><br />
+    <label for="login-password">비밀번호: </label>
+    <input type="password" id="login-password" name="password" required /><br /><br />
+    <button type="submit">로그인</button>
+  </form>
+  <div id="login-result"></div>
+
+  <!-- 닉네임 변경 폼 -->
+  <h2>닉네임 변경</h2>
+  <form id="changeNameForm">
+    <label for="change-id">ID (이메일): </label>
+    <input type="email" id="change-id" name="id" required /><br /><br />
+    <label for="change-password">비밀번호: </label>
+    <input type="password" id="change-password" name="password" required /><br /><br />
+    <label for="new-name">새 이름: </label>
+    <input type="text" id="new-name" name="newName" required /><br /><br />
+    <button type="submit">이름 변경</button>
+  </form>
+  <div id="changeName-result"></div>
+
+  <!-- 회원탈퇴 폼 -->
+  <h2>회원탈퇴</h2>
+  <form id="signOutForm">
+    <label for="delete-id">ID (이메일): </label>
+    <input type="email" id="delete-id" name="id" required /><br /><br />
+    <label for="delete-password">비밀번호: </label>
+    <input type="password" id="delete-password" name="password" required /><br /><br />
+    <button type="submit">회원탈퇴</button>
+  </form>
+  <div id="signOut-result"></div>
+
+  <!-- JavaScript 파일 링크 -->
+  <script src="index.js"></script>
+</body>
+
+</html>
