@@ -8,8 +8,34 @@ datasource db {
 }
 
 model user {
-  id       Int    @id @default(autoincrement())
-  account  String @unique(map: "User_account_key")
-  name     String
-  password String
+  id          Int          @id @default(autoincrement())
+  account     String       @unique(map: "User_account_key")
+  name        String
+  password    String
+  character   Character?   @relation(fields: [characterId], references: [id])
+  characterId Int?
+  userPlayers userPlayer[] // userPlayer와의 관계 (1대 다 관계)
+}
+
+model userPlayer {
+  id          Int       @id @default(autoincrement())
+  user        user      @relation(fields: [userId], references: [id])
+  userId      Int // 유저와 연결된 외래키
+  character   Character @relation(fields: [characterId], references: [id]) // 유저가 선택한 캐릭터와 연결
+  characterId Int // 캐릭터 외래키
+  level       Int       @default(1) // 캐릭터 레벨
+  cash        Int       @default(0) // 게임 내 캐쉬
+  experience  Int       @default(0) // 경험치
+  inventory   String? // 인벤토리 정보 (간단히 String으로 저장할 수도 있고, 별도의 테이블로 확장 가능)
+}
+
+model Character {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  health      Int
+  power       Int
+  defence     Int
+  speed       Int
+  userPlayers userPlayer[] // userPlayer와의 관계 (1대 다 관계)
+  user        user[]
 }
