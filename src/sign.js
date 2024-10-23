@@ -89,15 +89,15 @@ async function signUp(req, res) {
       ],
     });
 
-    // 기본 아이템 4개 지급
+    // 기본 아이템 4개 지급 - Inventory 테이블에 추가
     const defaultItems = [1, 2, 3, 4]; // 기본 아이템 ID들
-    await prisma.user.update({
-      where: { userId: newUser.userId },
-      data: {
-        items: {
-          connect: defaultItems.map((itemId) => ({ itemId })),
-        },
-      },
+    const inventoryData = defaultItems.map((itemId) => ({
+      userId: newUser.userId,
+      itemId,
+    }));
+
+    await prisma.inventory.createMany({
+      data: inventoryData,
     });
 
     // 첫 번째 캐릭터에 첫 번째 아이템 장착 상태로 설정

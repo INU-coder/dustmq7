@@ -57,9 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
           localStorage.setItem('refreshToken', result.refreshToken);
           localStorage.setItem('userId', result.user.id); // 유저 ID 저장
 
-          // playerId도 저장
-          localStorage.setItem('playerId', result.playerId); // 로그인 후 playerId 저장
-
+          // playerId는 로그인 후 별도로 받아올 수 있으므로 이후 API 호출에서 처리
           showGameSections(result.user.name, result.user.cash);
         } else {
           document.getElementById('login-result').innerText =

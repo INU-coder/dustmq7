@@ -15,27 +15,21 @@ async function equipCharacter(userId, characterId) {
     const intUserId = parseInt(userId, 10);
     const intCharacterId = parseInt(characterId, 10);
 
-    // 모든 플레이어에서 장착된 캐릭터를 해제
+    // 모든 플레이어에서 장착된 캐릭터를 해제 (equippedItemId 초기화는 불필요함)
     await prisma.player.updateMany({
       where: { userId: intUserId },
-      data: { equippedItemId: null }, // 기존 캐릭터 해제
+      data: { equippedItemId: null }, // 기존 장착 아이템 해제
     });
 
-    // 새 캐릭터를 장착
-    await prisma.player.updateMany({
+    // 새 캐릭터 장착 (단일 업데이트)
+    const updatedPlayer = await prisma.player.update({
       where: {
-        userId: intUserId,
-        characterId: intCharacterId,
+        userId_characterId: {
+          userId: intUserId,
+          characterId: intCharacterId,
+        },
       },
-      data: { characterId: intCharacterId }, // 새 캐릭터 장착
-    });
-
-    // 새로 장착된 캐릭터의 상세 정보 조회
-    const updatedPlayer = await prisma.player.findFirst({
-      where: {
-        userId: intUserId,
-        characterId: intCharacterId,
-      },
+      data: { characterId: intCharacterId },
       include: {
         character: true, // 캐릭터 상세 정보 포함
       },
@@ -43,7 +37,7 @@ async function equipCharacter(userId, characterId) {
 
     if (updatedPlayer && updatedPlayer.character) {
       console.log(
-        `캐릭터 장착 성공: ${updatedPlayer.character.name} (ID: ${updatedPlayer.character.CharacterId})`
+        `캐릭터 장착 성공: ${updatedPlayer.character.name} (ID: ${updatedPlayer.character.id})`
       );
     } else {
       console.log('캐릭터 장착 성공, 하지만 캐릭터 정보를 찾을 수 없습니다.');
@@ -75,7 +69,7 @@ async function createPlayer(userId, characterId) {
 
     // 선택한 캐릭터 정보 가져오기
     const character = await prisma.character.findUnique({
-      where: { CharacterId: intCharacterId }, // CharacterId로 수정
+      where: { id: intCharacterId }, // CharacterId -> id로 수정
     });
 
     if (!character) {
@@ -83,7 +77,7 @@ async function createPlayer(userId, characterId) {
     }
 
     const playerLevel = 1; // 초기 플레이어 레벨
-    const sumdAttackPower = sumAttackPower(playerLevel, character.power); // 공격력 계산
+    const summedAttackPower = sumAttackPower(playerLevel, character.power); // 공격력 계산
 
     // 유저 플레이어 생성
     const newPlayer = await prisma.player.create({
@@ -92,14 +86,13 @@ async function createPlayer(userId, characterId) {
         characterId: intCharacterId,
         level: playerLevel,
         exp: 0,
-        inventory: '',
         equippedItemId: null, // 기본으로 장착 상태 없음
       },
     });
 
     console.log('플레이어 생성 성공:', newPlayer);
-    console.log(`캐릭터 공격력: ${sumdAttackPower}`);
-    return { ...newPlayer, sumdAttackPower };
+    console.log(`캐릭터 공격력: ${summedAttackPower}`);
+    return { ...newPlayer, summedAttackPower };
   } catch (error) {
     console.error('플레이어 생성 오류:', error);
   }
@@ -109,18 +102,18 @@ async function createPlayer(userId, characterId) {
 async function updatePlayer(playerId, newLevel) {
   try {
     const player = await prisma.player.findUnique({
-      where: { playerId: playerId }, // playerId로 수정
-      include: { character: true }, // 캐릭터 정보도 포함
+      where: { playerId: playerId },
+      include: { character: true },
     });
 
     if (!player) {
       throw new Error('플레이어를 찾을 수 없습니다.');
     }
 
-    const newAttackPower = sumAttackPower(newLevel, player.character.power); // sumAttackPower로 공격력 계산
+    const newAttackPower = sumAttackPower(newLevel, player.character.power);
 
     const updatedPlayer = await prisma.player.update({
-      where: { playerId: playerId }, // playerId로 수정
+      where: { playerId: playerId },
       data: {
         level: newLevel,
       },
@@ -136,34 +129,29 @@ async function updatePlayer(playerId, newLevel) {
 // 플레이어의 아이템 장착 함수
 async function equipItem(playerId, itemId) {
   try {
-    // playerId가 존재하는지 확인
-    if (!playerId || isNaN(playerId)) {
-      throw new Error('유효하지 않은 playerId');
-    }
-
     // 장착할 아이템 정보 가져오기
     const item = await prisma.item.findUnique({
-      where: { itemId: parseInt(itemId, 10) }, // itemId를 Int로 변환하여 사용
+      where: { id: parseInt(itemId, 10) }, // id 필드 사용
     });
 
     if (!item) {
       throw new Error('해당 아이템을 찾을 수 없습니다.');
     }
 
-    // 플레이어의 기존 장착 아이템 해제 (장착 아이템을 null로 설정)
+    // 기존 장착 아이템 해제
     await prisma.player.updateMany({
-      where: { playerId: parseInt(playerId, 10) }, // playerId를 Int로 변환하여 사용
-      data: { equippedItemId: null }, // 기존 장착 아이템 해제
+      where: { playerId: parseInt(playerId, 10) },
+      data: { equippedItemId: null },
     });
 
-    // 플레이어에게 새로운 아이템 장착 (equippedItemId를 업데이트)
+    // 새로운 아이템 장착
     const updatedPlayer = await prisma.player.update({
-      where: { playerId: parseInt(playerId, 10) }, // playerId를 Int로 변환하여 사용
+      where: { playerId: parseInt(playerId, 10) },
       data: {
-        equippedItemId: parseInt(itemId, 10), // equippedItemId를 업데이트
+        equippedItemId: parseInt(itemId, 10),
       },
       include: {
-        equippedItem: true, // 장착된 아이템 정보 포함
+        equippedItem: true,
       },
     });
 
@@ -179,9 +167,9 @@ async function equipItem(playerId, itemId) {
 async function getPlayer(playerId) {
   try {
     const player = await prisma.player.findUnique({
-      where: { playerId: playerId }, // playerId로 수정
+      where: { playerId: playerId },
       include: {
-        equippedItem: true, // 플레이어가 장착한 아이템 정보 포함
+        equippedItem: true,
       },
     });
     return player;
@@ -202,10 +190,9 @@ router.post('/create', async (req, res) => {
   const { userId, characterId } = req.body;
   const newPlayer = await createPlayer(userId, characterId);
 
-  // 플레이어가 생성되면 playerId를 응답으로 보냅니다.
   res.json({
     success: true,
-    playerId: newPlayer.playerId, // playerId를 전달
+    playerId: newPlayer.playerId,
     message: '플레이어가 성공적으로 생성되었습니다.',
   });
 });
@@ -218,10 +205,10 @@ router.put('/update', async (req, res) => {
 });
 
 // 플레이어 정보 조회
-router.get('/:userId', async (req, res) => {
-  const { userId } = req.params;
-  const players = await getPlayer(userId);
-  res.json(players);
+router.get('/:playerId', async (req, res) => {
+  const { playerId } = req.params;
+  const player = await getPlayer(playerId);
+  res.json(player);
 });
 
 // 아이템 장착 API (POST)
