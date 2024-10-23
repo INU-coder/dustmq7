@@ -1,60 +1,164 @@
-/* 다크 모드 기본 설정 */
-body {
-  transition: background-color 0.5s ease, color 0.5s ease; /* 0.5초 동안 서서히 변환 */
-}
-
-.dark-mode {
-  background-color: #121212;
-  color: #ffffff;
-}
-
-button.toggle-theme {
-  transition: background-color 0.5s ease, color 0.5s ease;
-}
-
-button.toggle-theme.dark-mode {
-  background-color: #ffffff;
-  color: #121212;
-}
+/* 기본 스타일 */
 body {
   font-family: Arial, sans-serif;
-  background-color: #ffffff;
-  color: #000000;
+  background-color: #9b9a77;
+  color: #333;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
 }
 
-h1 {
-  font-size: 2.5em;
+h1,
+h2,
+h3 {
+  text-align: center;
 }
 
 form {
-  margin: 20px 0;
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #9b9a77;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+label {
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 button {
-  background-color: #4caf50;
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
   color: white;
-  padding: 10px 20px;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
+  font-size: 16px;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #0056b3;
 }
 
+#auth-section,
+#game-section {
+  margin-top: 20px;
+}
+
+#signup-result,
+#login-result,
+#changeName-result,
+#signOut-result,
+#character-selection-result,
+#item-selection-result {
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+#game-section {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#equipped-character img {
+  display: block;
+  margin: 10px auto;
+}
+
+#equipped-character p {
+  text-align: center;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+#character-list,
+#item-list {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.character-btn,
+.item-btn {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  cursor: pointer;
+}
+
+.character-btn:hover,
+.item-btn:hover {
+  background-color: #e0e0e0;
+}
+
+#inventory-list {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+#inventory-list li {
+  padding: 10px;
+  background-color: #f8f8f8;
+  margin: 5px 0;
+  border-radius: 4px;
+}
+
+/* 다크 모드 스타일 */
 .dark-mode {
-  background-color: #333333;
+  background-color: #333;
   color: white;
 }
 
-.toggle-theme {
-  margin-bottom: 20px;
+.dark-mode button {
+  background-color: #555;
+  color: white;
+}
+
+.dark-mode button:hover {
+  background-color: #444;
+}
+
+.dark-mode input {
+  background-color: #444;
+  color: white;
+  border: 1px solid #666;
+}
+
+.dark-mode form {
+  background-color: #444;
+}
+
+.dark-mode #game-section {
+  background-color: #444;
+}
+
+.dark-mode .character-btn,
+.dark-mode .item-btn {
+  background-color: #555;
+}
+
+.dark-mode .character-btn:hover,
+.dark-mode .item-btn:hover {
+  background-color: #666;
+}
+
+.dark-mode #inventory-list li {
+  background-color: #555;
 }

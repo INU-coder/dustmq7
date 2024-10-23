@@ -1,7 +1,5 @@
 import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
-// import express from 'express';
-// user 1.level * 케릭터 stats
 async function main() {
   // name    String @unique
   // health  Int

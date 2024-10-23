@@ -8,34 +8,71 @@ datasource db {
 }
 
 model user {
-  id          Int          @id @default(autoincrement())
-  account     String       @unique(map: "User_account_key")
+  userId      Int        @id @default(autoincrement())
+  account     String     @unique
   name        String
   password    String
-  character   Character?   @relation(fields: [characterId], references: [id])
+  character   Character? @relation(fields: [characterId], references: [CharacterId])
   characterId Int?
-  userPlayers userPlayer[] // userPlayer와의 관계 (1대 다 관계)
+  cash        Int        @default(0)
+  inventory   String?    // 인벤토리 정보 (유저 전체가 소유한 아이템 정보)
+  players     player[]   // 유저가 여러 플레이어를 가질 수 있음
+  items       item[]     @relation("UserItems")  // 유저가 여러 아이템을 소유할 수 있음
+  createdAt   DateTime   @default(now())
+
+  @@map("users")
 }
 
-model userPlayer {
-  id          Int       @id @default(autoincrement())
-  user        user      @relation(fields: [userId], references: [id])
-  userId      Int // 유저와 연결된 외래키
-  character   Character @relation(fields: [characterId], references: [id]) // 유저가 선택한 캐릭터와 연결
-  characterId Int // 캐릭터 외래키
-  level       Int       @default(1) // 캐릭터 레벨
-  cash        Int       @default(0) // 게임 내 캐쉬
-  experience  Int       @default(0) // 경험치
-  inventory   String? // 인벤토리 정보 (간단히 String으로 저장할 수도 있고, 별도의 테이블로 확장 가능)
+model player {
+  playerId          Int       @id @default(autoincrement())
+  user              user      @relation(fields: [userId], references: [userId])
+  userId            Int
+  character         Character @relation(fields: [characterId], references: [CharacterId])
+  characterId       Int
+  level             Int       @default(1)  // 각 플레이어의 레벨
+  exp               Int       @default(0)  // 각 플레이어의 경험치
+  equippedItemId    Int?      @unique  // 장착된 아이템의 ID (플레이어가 장착한 아이템만 관리)
+  equippedItem      item?     @relation(fields: [equippedItemId], references: [itemId])  // 장착된 아이템
+
+  @@map("players")
 }
 
 model Character {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
+  CharacterId Int      @id @default(autoincrement())
+  name        String   @unique
   health      Int
   power       Int
   defence     Int
   speed       Int
-  userPlayers userPlayer[] // userPlayer와의 관계 (1대 다 관계)
-  user        user[]
+  players     player[] // 캐릭터와 여러 플레이어 관계
+
+  @@map("characters")
 }
+
+model item {
+  itemId          Int      @id @default(autoincrement())
+  name            String
+  type            String   // 검, 활, 지팡이, 방패 등
+  power           Int
+  defence         Int
+  speed           Int
+  knockBack       Int
+  rank            String
+  users           user[]   @relation("UserItems")  // 여러 유저가 아이템을 소유할 수 있음
+  equippedPlayers player[] // 여러 플레이어가 아이템을 장착할 수 있음
+
+  @@map("items")
+}
+
+// model pack {
+//   packId Int    @id @default(autoincrement()) @map("pack_id")
+//   name   String @map("name")
+//   price  Int    @map("price")
+//   APB    Int    @map("APB")
+//   BPB    Int    @map("BPB")
+//   CPB    Int    @map("CPB")
+//   DPB    Int    @map("DPB")
+//   EPB    Int    @map("EPB")
+
+//   @@map("packs")
+// }

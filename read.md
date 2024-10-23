@@ -7,6 +7,11 @@
 나머지 25%일지도모르는 부분을 채우기 위해서 md파일을 작성하기로 했다.
 우선은.
 
+노래 무료 다운로드 및 사용가능한 사이트
+간혹 조건이 붙을 수 있으니 주의요망
+sell뮤직
+https://www.sellbuymusic.com/?gad_source=1&gclid=Cj0KCQjwsc24BhDPARIsAFXqAB2ePBwBVxSsa24qi2uZZaz72z6rXf1ppMQu1KYsI79AKLzPUNCWfgEaAssXEALw_wcB
+
 # 데이터베이스 설정
 
 1. **데이터베이스 생성**:
@@ -81,14 +86,20 @@ D Int @map("d")
 아직은 할게많다.
 dustmq7
 ├── client // 프론트 코드
+│ │ └── png/
+│ │ ├──Archer.PNG
+│ │ ├──Defender.PNG
+│ │ ├──Healer.PNG
+│ │ └──Slayer.PNG
 │ ├── index.html
 │ ├── index.js
 │ └── styles.css
 ├── prisma
 │   └── schema.prisma
 ├── src // 서버 코드
-│ ├── index.js
-│ └── sign.js
+│ ├── app.js
+│ ├── sign.js
+│ └── player.js
 ├── .env
 ├── .gitignore
 ├── .prettierc
@@ -254,11 +265,11 @@ account
 password
 name
 cashAmount
-유저 플래이어 DB를 생성
+유저 플래이어 DB를 생성o
 Id
 userid
 
-케릭터 DB를 생성해보자 -뭐가필요할까
+케릭터 DB를 생성해보자 -뭐가필요할까o
 케릭터id?
 케릭터name
 체력,
@@ -277,7 +288,7 @@ userid
 게임기능을 만들어보자.
 멀티가 되는지 테스트해보자?
 
-케릭터가 아니라 역활 로 해야겠당.
+케릭터가 아니라 역활 로 해야겠당.o
 
 import readlineSync from 'readline-sync';
 이건 로그라이크게임만들때 server.js파일에있던 모듈이다.
@@ -286,3 +297,15 @@ import readlineSync from 'readline-sync';
 와씨
 이걸 힌트라는 버튼을 눌러서 "나는 게임을 못합니다" 라고 입력하면
 정답을 알려주는 버튼을 만들면 누를지 말지 정말 궁금하다
+
+health: 150,
+power: 50,
+defence: 100,
+speed: 20,
+
+무기는. 어떤영향을 줘야될까
+power
+넉백
+
+스킬개념.
+1234에 단축기로 넣어보자.

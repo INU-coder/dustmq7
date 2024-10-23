@@ -15,29 +15,30 @@ const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 // 회원가입을 검사하는 joi
 const 회원가입검사 = Joi.object({
   id: Joi.string().min(3).email().required().messages({
-    'string.email': '선생님 ID는 유효한 이메일 형식이여야해요...',
-    'string.min': 'ID는 최소 3글자 이상이여야해요... ',
-    'any.required': '당신 ID를 입력하지 않았군... 넌 못지나간다.',
+    'string.email': 'ID는 유효한 이메일 형식이여야 합니다.',
+    'string.min': 'ID는 최소 3글자 이상이여야 합니다.',
+    'any.required': 'ID는 필수 항목입니다.',
   }),
   name: Joi.string().min(1).required().messages({
-    'string.min': '당신의 이름이 한글자 미만이라면 뭐라고 불러야 하죠?',
-    'any.required': '당신 name을 입력하지 않았군... 넌 못지나간다.',
+    'string.min': '이름은 최소 1글자 이상이여야 합니다.',
+    'any.required': '이름은 필수 항목입니다.',
   }),
   password: Joi.string().min(3).lowercase().required().messages({
-    'string.min': '세자리보다 적은 자물쇠는 없습니다.',
-    'any.required': '비밀번호가 없는 당신은 도플갱어입니다.',
+    'string.min': '비밀번호는 최소 3자 이상이어야 합니다.',
+    'any.required': '비밀번호는 필수 항목입니다.',
   }),
 });
+
 // 로그인을 검사하는 joi
 const 로그인검사 = Joi.object({
   id: Joi.string().min(3).email().required().messages({
-    'string.email': '선생님 ID는 유효한 이메일 형식이여야해요...',
-    'string.min': 'ID는 최소 3글자 이상이여야해요... ',
-    'any.required': '당신 ID를 입력하지 않았군... 넌 못지나간다.',
+    'string.email': 'ID는 유효한 이메일 형식이여야 합니다.',
+    'string.min': 'ID는 최소 3글자 이상이여야 합니다.',
+    'any.required': 'ID는 필수 항목입니다.',
   }),
   password: Joi.string().min(3).lowercase().required().messages({
-    'string.min': '세자리보다 적은 자물쇠는 없습니다.',
-    'any.required': '비밀번호가 없는 당신은 도플갱어입니다.',
+    'string.min': '비밀번호는 최소 3자 이상이어야 합니다.',
+    'any.required': '비밀번호는 필수 항목입니다.',
   }),
 });
 
@@ -52,31 +53,66 @@ function 리프레시토큰생성(userId) {
 
 // 회원가입 함수
 async function signUp(req, res) {
-  console.log('Received signup request:', req.body); // 요청 데이터 출력
+  console.log('Received signup request:', req.body);
   const { id, name, password } = req.body;
+
+  // 회원가입 입력값 검증
   const { error } = 회원가입검사.validate({ id, name, password });
   if (error) {
-    console.log('Validation error:', error); // 유효성 검사 실패 시 출력
     return res
       .status(400)
       .json({ success: false, message: error.details[0].message });
   }
+
   try {
+    // 이미 존재하는 유저인지 확인
     const inUser = await prisma.user.findUnique({ where: { account: id } });
+
     if (inUser) {
-      return res.status(400).json({
-        success: false,
-        message: '그 사람은 방금 저와 통화 했습니다. 당신은 누구죠?',
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: '이미 존재하는 사용자입니다.' });
     }
-    await prisma.user.create({
+
+    // 새 유저 생성
+    const newUser = await prisma.user.create({
       data: { account: id, name, password },
     });
-    return res
-      .status(200)
-      .json({ success: true, message: `처음 뵙겠습니다. ${name}.` });
+
+    // 유저에게 기본 캐릭터 4개 생성
+    await prisma.player.createMany({
+      data: [
+        { userId: newUser.userId, characterId: 1 }, // 기본 캐릭터 1
+        { userId: newUser.userId, characterId: 2 }, // 기본 캐릭터 2
+        { userId: newUser.userId, characterId: 3 }, // 기본 캐릭터 3
+        { userId: newUser.userId, characterId: 4 }, // 기본 캐릭터 4
+      ],
+    });
+
+    // 기본 아이템 4개 지급
+    const defaultItems = [1, 2, 3, 4]; // 기본 아이템 ID들
+    await prisma.user.update({
+      where: { userId: newUser.userId },
+      data: {
+        items: {
+          connect: defaultItems.map((itemId) => ({ itemId })),
+        },
+      },
+    });
+
+    // 첫 번째 캐릭터에 첫 번째 아이템 장착 상태로 설정
+    await prisma.player.updateMany({
+      where: { userId: newUser.userId, characterId: 1 },
+      data: { equippedItemId: 1 }, // 첫 번째 캐릭터에 첫 번째 아이템 장착
+    });
+
+    // 성공 응답
+    return res.status(200).json({
+      success: true,
+      message: `환영합니다, ${name}. 기본 캐릭터와 아이템이 지급되었습니다.`,
+    });
   } catch (error) {
-    console.error('Error during signup:', error); // 에러 로그 출력
+    console.error('Error during signup:', error);
     return res
       .status(500)
       .json({ success: false, message: '회원가입 중 오류가 발생했습니다.' });
@@ -85,7 +121,6 @@ async function signUp(req, res) {
 
 // 로그인 함수
 async function login(req, res) {
-  console.log('Received login request body:', req.body); // 요청 데이터를 콘솔에 출력
   const { id, password } = req.body;
   const { error } = 로그인검사.validate({ id, password });
   if (error) {
@@ -93,33 +128,23 @@ async function login(req, res) {
       .status(400)
       .json({ success: false, message: error.details[0].message });
   }
-
   try {
     const user = await prisma.user.findUnique({ where: { account: id } });
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: '그런 녀석은 존재하지 않아 누구냐 넌',
-      });
+    if (!user || user.password !== password) {
+      return res
+        .status(400)
+        .json({ success: false, message: '잘못된 로그인 정보입니다.' });
     }
-    if (user.password !== password) {
-      return res.status(400).json({
-        success: false,
-        message: '비밀번호가 틀렸습니다 당신은 로봇입니까?',
-      });
-    }
-    const accessToken = 액세스토큰생성(user.id);
-    const refreshToken = 리프레시토큰생성(user.id);
-    // 로그인 성공 시 보내는 데이터
+
+    const accessToken = 액세스토큰생성(user.userId);
+    const refreshToken = 리프레시토큰생성(user.userId);
+
     return res.status(200).json({
       success: true,
       message: `로그인 성공! 환영합니다, ${user.name}`,
-      accessToken, // 토큰을 응답에 포함
-      refreshToken, // 토큰을 응답에 포함
-      user: {
-        id: user.id,
-        name: user.name,
-      },
+      accessToken,
+      refreshToken,
+      user: { id: user.userId, name: user.name },
     });
   } catch (error) {
     console.error('로그인 중 오류:', error);
@@ -135,18 +160,18 @@ async function changeName(req, res) {
   try {
     const user = await prisma.user.findUnique({ where: { account: id } });
     if (!user || user.password !== password) {
-      return res.status(400).json({
-        success: false,
-        message: '비밀번호가 틀렸어요 당신은 로봇입니다.^^',
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: '비밀번호가 틀렸습니다.' });
     }
+
     await prisma.user.update({
       where: { account: id },
       data: { name: newName },
     });
     return res.status(200).json({
       success: true,
-      message: `이름을 바꾸셨네요...? 왜 바꾸셨죠?${newName}.`,
+      message: `이름이 ${newName}로 변경되었습니다.`,
     });
   } catch (error) {
     console.error(error);
@@ -164,13 +189,12 @@ async function signOut(req, res) {
     if (!user || user.password !== password) {
       return res
         .status(400)
-        .json({ success: false, message: '들어올 땐 마음대로지만...' });
+        .json({ success: false, message: '로그인 정보가 잘못되었습니다.' });
     }
     await prisma.user.delete({ where: { account: id } });
     return res.status(200).json({
       success: true,
-      message:
-        '잘가요... 제가 진짜 가는사람 붙잡는거 안좋아하는데... 진짜 이대로 가시면 서운할거 같아요... 다시 오실거죠...?',
+      message: '회원 탈퇴가 완료되었습니다. 다시 돌아오실거죠?',
     });
   } catch (error) {
     console.error(error);

@@ -4,64 +4,110 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>베이직반 탈출기</title>
+  <title>디펜스 게임 만들기</title>
   <!-- CSS 파일 링크 -->
   <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-  <h1>회원가입 및 로그인 시스템</h1>
+  <h1>디펜스 게임 만들기</h1>
 
   <!-- 다크 모드 전환 버튼 -->
   <button class="toggle-theme">다크 모드로 전환</button>
 
-  <!-- 회원가입 폼 -->
-  <h2>회원가입</h2>
-  <form id="signupForm">
-    <label for="signup-id">ID (이메일): </label>
-    <input type="email" id="signup-id" name="id" required /><br /><br />
-    <label for="signup-name">이름: </label>
-    <input type="text" id="signup-name" name="name" required /><br /><br />
-    <label for="signup-password">비밀번호: </label>
-    <input type="password" id="signup-password" name="password" required /><br /><br />
-    <button type="submit">회원가입</button>
-  </form>
-  <div id="signup-result"></div>
+  <div id="auth-section">
+    <!-- 회원가입 폼 -->
+    <h2>회원가입</h2>
+    <form id="signupForm">
+      <label for="signup-id">ID (이메일): </label>
+      <input type="email" id="signup-id" name="id" required /><br /><br />
+      <label for="signup-name">이름: </label>
+      <input type="text" id="signup-name" name="name" required /><br /><br />
+      <label for="signup-password">비밀번호: </label>
+      <input type="password" id="signup-password" name="password" required /><br /><br />
+      <button type="submit">회원가입</button>
+    </form>
+    <div id="signup-result"></div>
 
-  <!-- 로그인 폼 -->
-  <h2>로그인</h2>
-  <form id="loginForm">
-    <label for="login-id">ID (이메일): </label>
-    <input type="email" id="login-id" name="id" required /><br /><br />
-    <label for="login-password">비밀번호: </label>
-    <input type="password" id="login-password" name="password" required /><br /><br />
-    <button type="submit">로그인</button>
-  </form>
-  <div id="login-result"></div>
+    <!-- 로그인 폼 -->
+    <h2>로그인</h2>
+    <form id="loginForm">
+      <label for="login-id">ID (이메일): </label>
+      <input type="email" id="login-id" name="id" required /><br /><br />
+      <label for="login-password">비밀번호: </label>
+      <input type="password" id="login-password" name="password" required /><br /><br />
+      <button type="submit">로그인</button>
+    </form>
+    <div id="login-result"></div>
 
-  <!-- 닉네임 변경 폼 -->
-  <h2>닉네임 변경</h2>
-  <form id="changeNameForm">
-    <label for="change-id">ID (이메일): </label>
-    <input type="email" id="change-id" name="id" required /><br /><br />
-    <label for="change-password">비밀번호: </label>
-    <input type="password" id="change-password" name="password" required /><br /><br />
-    <label for="new-name">새 이름: </label>
-    <input type="text" id="new-name" name="newName" required /><br /><br />
-    <button type="submit">이름 변경</button>
-  </form>
-  <div id="changeName-result"></div>
+    <!-- 닉네임 변경 폼 -->
+    <h2>닉네임 변경</h2>
+    <form id="changeNameForm">
+      <label for="change-id">ID (이메일): </label>
+      <input type="email" id="change-id" name="id" required /><br /><br />
+      <label for="change-password">비밀번호: </label>
+      <input type="password" id="change-password" name="password" required /><br /><br />
+      <label for="new-name">새 이름: </label>
+      <input type="text" id="new-name" name="newName" required /><br /><br />
+      <button type="submit">이름 변경</button>
+    </form>
+    <div id="changeName-result"></div>
 
-  <!-- 회원탈퇴 폼 -->
-  <h2>회원탈퇴</h2>
-  <form id="signOutForm">
-    <label for="delete-id">ID (이메일): </label>
-    <input type="email" id="delete-id" name="id" required /><br /><br />
-    <label for="delete-password">비밀번호: </label>
-    <input type="password" id="delete-password" name="password" required /><br /><br />
-    <button type="submit">회원탈퇴</button>
-  </form>
-  <div id="signOut-result"></div>
+    <!-- 회원탈퇴 폼 -->
+    <h2>회원탈퇴</h2>
+    <form id="signOutForm">
+      <label for="delete-id">ID (이메일): </label>
+      <input type="email" id="delete-id" name="id" required /><br /><br />
+      <label for="delete-password">비밀번호: </label>
+      <input type="password" id="delete-password" name="password" required /><br /><br />
+      <button type="submit">회원탈퇴</button>
+    </form>
+    <div id="signOut-result"></div>
+  </div>
+
+  <!-- 게임 섹션 (로그인 후 표시) -->
+  <div id="game-section" style="display: none;">
+    <h2>현재 장착된 캐릭터</h2>
+    <div id="equipped-character">
+      <img id="equipped-character-image" src="" alt="캐릭터 이미지" style="width: 150px; height: auto;" />
+      <p id="equipped-character-name"></p>
+    </div>
+
+    <h3>플레이어 정보</h3>
+    <div>
+      <p><strong>플레이어:</strong> <span id="player-name"></span></p>
+      <p><strong>보유 캐쉬:</strong> <span id="player-cash"></span></p>
+    </div>
+
+    <h3>캐릭터 목록</h3>
+    <div id="character-list">
+      <!-- 캐릭터 선택 버튼 -->
+      <button class="character-btn" data-character-id="1" data-character-name="방패병"
+        data-character-image="Defender.PNG">방패병</button>
+      <button class="character-btn" data-character-id="2" data-character-name="검사"
+        data-character-image="Slayer.PNG">검사</button>
+      <button class="character-btn" data-character-id="3" data-character-name="힐러"
+        data-character-image="Healer.PNG">힐러</button>
+      <button class="character-btn" data-character-id="4" data-character-name="궁수"
+        data-character-image="Archer.PNG">궁수</button>
+    </div>
+    <p id="character-selection-result"></p>
+
+    <h3>아이템 목록</h3>
+    <div id="item-list">
+      <!-- 아이템 선택 버튼 -->
+      <button class="item-btn" data-item-id="1">검</button>
+      <button class="item-btn" data-item-id="2">활</button>
+      <button class="item-btn" data-item-id="3">지팡이</button>
+      <button class="item-btn" data-item-id="4">방패</button>
+    </div>
+    <p id="item-selection-result"></p>
+
+    <!-- 인벤토리 보기 -->
+    <h3>인벤토리</h3>
+    <button id="inventory-btn">인벤토리 보기</button>
+    <ul id="inventory-list"></ul>
+  </div>
 
   <!-- JavaScript 파일 링크 -->
   <script src="index.js"></script>
